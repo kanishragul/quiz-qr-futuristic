@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Participant</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { font-family: 'Arial', sans-serif; background: #1a1a2e; color: #fff; margin: 0; }
+    .container { max-width: 900px; margin: auto; padding: 20px; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab { padding: 10px 20px; background: #162447; border-radius: 10px; cursor: pointer; transition: 0.3s; }
+    .tab.active { background: #1f4068; }
+    .tab.locked { opacity: 0.5; cursor: not-allowed; }
+    .question { margin-bottom: 20px; }
+    .question h3 { margin-bottom: 10px; }
+    .options button { display: block; margin: 5px 0; padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+    .options button:hover { background: #e43f5a; color: #fff; }
+    .btn-submit { margin-top: 10px; padding: 10px 20px; background: #e43f5a; border: none; border-radius: 8px; cursor: pointer; color: #fff; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to Quiz Futuristic</h1>
+    <p>Complete all 5 tabs to finish the quiz. Your answers are secure!</p>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" data-tab="0">Game 1</div>
+      <div class="tab" data-tab="1">Game 2</div>
+      <div class="tab" data-tab="2">Game 3</div>
+      <div class="tab" data-tab="3">Game 4</div>
+      <div class="tab" data-tab="4">Game 5</div>
+    </div>
+
+    <!-- Question Area -->
+    <div id="quiz-area"></div>
+
+    <button id="btn-submit" class="btn-submit">Submit Tab</button>
+  </div>
+
+  <script>
+    // Example Questions (Replace with backend/fetch)
+    const questions = [
+      [
+        { q: "Question 1 of Game 1?", options: ["A","B","C","D"] },
+        { q: "Question 2 of Game 1?", options: ["A","B","C","D"] }
+      ],
+      [
+        { q: "Question 1 of Game 2?", options: ["A","B","C","D"] },
+        { q: "Question 2 of Game 2?", options: ["A","B","C","D"] }
+      ],
+      [
+        { q: "Question 1 of Game 3?", options: ["A","B","C","D"] },
+        { q: "Question 2 of Game 3?", options: ["A","B","C","D"] }
+      ],
+      [
+        { q: "Question 1 of Game 4?", options: ["A","B","C","D"] },
+        { q: "Question 2 of Game 4?", options: ["A","B","C","D"] }
+      ],
+      [
+        { q: "Question 1 of Game 5?", options: ["A","B","C","D"] },
+        { q: "Question 2 of Game 5?", options: ["A","B","C","D"] }
+      ]
+    ];
+
+    let currentTab = 0;
+    const userAnswers = [[], [], [], [], []];
+    const lockedTabs = [false, false, false, false, false];
+
+    const quizArea = document.getElementById("quiz-area");
+    const btnSubmit = document.getElementById("btn-submit");
+    const tabs = document.querySelectorAll(".tab");
+
+    function loadTab(tabIndex) {
+      if(lockedTabs[tabIndex]) return;
+      currentTab = tabIndex;
+      tabs.forEach(t => t.classList.remove("active"));
+      tabs[tabIndex].classList.add("active");
+      quizArea.innerHTML = "";
+      questions[tabIndex].forEach((q, i) => {
+        const div = document.createElement("div");
+        div.classList.add("question");
+        div.innerHTML = `<h3>${q.q}</h3>`;
+        const optionsDiv = document.createElement("div");
+        optionsDiv.classList.add("options");
+        q.options.forEach((opt, idx) => {
+          const btn = document.createElement("button");
+          btn.textContent = opt;
+          btn.onclick = () => {
+            userAnswers[tabIndex][i] = opt;
+            // Highlight selected
+            optionsDiv.querySelectorAll("button").forEach(b => b.style.background = "");
+            btn.style.background = "#e43f5a";
+          };
+          optionsDiv.appendChild(btn);
+        });
+        div.appendChild(optionsDiv);
+        quizArea.appendChild(div);
+      });
+    }
+
+    tabs.forEach((t, idx) => {
+      t.onclick = () => loadTab(idx);
+    });
+
+    btnSubmit.onclick = () => {
+      // Lock current tab
+      lockedTabs[currentTab] = true;
+      tabs[currentTab].classList.add("locked");
+      alert(`Tab ${currentTab+1} submitted!`);
+      // Automatically load next unlocked tab
+      const nextTab = lockedTabs.findIndex((l,i)=>!l);
+      if(nextTab!==-1) loadTab(nextTab);
+      else {
+        alert("All tabs completed! Your score will be calculated on server.");
+        // Redirect to leaderboard page
+        window.location.href = "leaderboard.html";
+      }
+    };
+
+    // Load first tab on page load
+    loadTab(0);
+  </script>
+</body>
+</html>

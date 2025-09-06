@@ -1,44 +1,54 @@
-
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Leaderboard</title>
-  <link rel="stylesheet" href="styles.css"/>
-  <style>body{background:#020615;color:#e6eefc}</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Leaderboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { font-family: 'Arial', sans-serif; background: #1a1a2e; color: #fff; margin: 0; }
+    .container { max-width: 900px; margin: auto; padding: 20px; text-align: center; }
+    h1 { color: #e43f5a; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 10px; border-bottom: 1px solid #fff; }
+    th { background: #162447; }
+    tr:hover { background: #1f4068; }
+    .btn { margin-top: 20px; padding: 10px 20px; background: #e43f5a; border: none; border-radius: 8px; cursor: pointer; color: #fff; font-weight: bold; text-decoration: none; }
+  </style>
 </head>
 <body>
   <div class="container">
-    <div class="card">
-      <h1>Final Leaderboard</h1>
-      <div id="info" class="small"></div>
-      <div id="board"></div>
-    </div>
+    <h1>Leaderboard</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Name</th>
+          <th>Score</th>
+          <th>Time Taken</th>
+        </tr>
+      </thead>
+      <tbody id="leaderboard-body">
+        <!-- Dynamic leaderboard entries -->
+      </tbody>
+    </table>
+    <a class="btn" href="review.html">Review All Answers</a>
   </div>
+
   <script>
-    async function loadBoard(){
-      const r = await fetch('/api/leaderboard');
-      const d = await r.json();
-      const info = document.getElementById('info');
-      const board = document.getElementById('board');
-      if (!d.published){
-        info.textContent = 'Leaderboard not published yet. Waiting for admin...';
-        board.innerHTML='';
-        setTimeout(loadBoard, 5000);
-        return;
-      }
-      info.textContent = '';
-      board.innerHTML = '<div class="grid" style="grid-template-columns:80px 2fr 1fr 1fr"><div><b>Rank</b></div><div><b>Name (Roll)</b></div><div><b>Score</b></div><div><b>Time (s)</b></div></div>';
-      d.leaderboard.forEach(item=>{
-        const row = document.createElement('div');
-        row.className='grid leader';
-        row.style.gridTemplateColumns='80px 2fr 1fr 1fr';
-        row.innerHTML = `<div>#${item.rank}</div><div>${item.name} (${item.roll})</div><div>${item.total_score}</div><div>${Math.round(item.total_time_ms/1000)}</div>`;
-        board.appendChild(row);
-      });
-    }
-    loadBoard();
+    // Example static data for now (replace with backend data fetch)
+    const leaderboard = [
+      { rank: 1, name: "Alice", score: 5, time: "3m 20s" },
+      { rank: 2, name: "Bob", score: 5, time: "4m 10s" },
+      { rank: 3, name: "Charlie", score: 4, time: "2m 55s" },
+    ];
+
+    const tbody = document.getElementById("leaderboard-body");
+    leaderboard.forEach(entry => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${entry.rank}</td><td>${entry.name}</td><td>${entry.score}</td><td>${entry.time}</td>`;
+      tbody.appendChild(tr);
+    });
   </script>
 </body>
 </html>

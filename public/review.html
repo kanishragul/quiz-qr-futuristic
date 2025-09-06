@@ -1,41 +1,65 @@
-
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Review Answers</title>
-  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { font-family: 'Arial', sans-serif; background: #1a1a2e; color: #fff; margin: 0; }
+    .container { max-width: 900px; margin: auto; padding: 20px; }
+    h1 { color: #e43f5a; text-align: center; }
+    .tab-section { margin-top: 30px; }
+    .question { background: #162447; margin-bottom: 15px; padding: 15px; border-radius: 10px; }
+    .correct { color: #00ff00; font-weight: bold; }
+    .wrong { color: #ff4c4c; font-weight: bold; }
+  </style>
 </head>
 <body>
   <div class="container">
-    <div class="card">
-      <h1>Review Answers</h1>
-      <p class="small">Available after leaderboard is published.</p>
-      <div id="list"></div>
-    </div>
+    <h1>Review Your Answers</h1>
+    
+    <div id="review-area"></div>
+    
   </div>
+
   <script>
-    async function loadReview(){
-      const r = await fetch('/api/review');
-      const d = await r.json();
-      if (d.error){ alert(d.error); return; }
-      const wrap = document.getElementById('list');
-      wrap.innerHTML = '';
-      d.items.forEach(it=>{
-        const div = document.createElement('div');
-        div.className = 'question';
-        const your = JSON.stringify(it.response);
-        const corr = JSON.stringify(it.correct);
-        div.innerHTML = `<div><b>Tab ${it.tab}</b> — ${it.text}</div>
-          <div class="grid" style="grid-template-columns:1fr 1fr">
-            <div><span class="badge">Your Answer</span><div>${your}</div></div>
-            <div><span class="badge">Correct Answer</span><div>${corr}</div></div>
-          </div>`;
-        wrap.appendChild(div);
+    // Example data (replace with backend data)
+    const reviewData = [
+      {
+        tab: "Game 1",
+        questions: [
+          { q: "Question 1 of Game 1?", your: "A", correct: "B" },
+          { q: "Question 2 of Game 1?", your: "C", correct: "C" },
+        ]
+      },
+      {
+        tab: "Game 2",
+        questions: [
+          { q: "Question 1 of Game 2?", your: "B", correct: "B" },
+          { q: "Question 2 of Game 2?", your: "D", correct: "C" },
+        ]
+      }
+    ];
+
+    const reviewArea = document.getElementById("review-area");
+
+    reviewData.forEach(section => {
+      const divTab = document.createElement("div");
+      divTab.classList.add("tab-section");
+      divTab.innerHTML = `<h2>${section.tab}</h2>`;
+      section.questions.forEach(q => {
+        const divQ = document.createElement("div");
+        divQ.classList.add("question");
+        divQ.innerHTML = `
+          <p>${q.q}</p>
+          <p>Your Answer: <span class="${q.your === q.correct ? 'correct' : 'wrong'}">${q.your}</span></p>
+          <p>Correct Answer: <span class="correct">${q.correct}</span></p>
+        `;
+        divTab.appendChild(divQ);
       });
-    }
-    loadReview();
+      reviewArea.appendChild(divTab);
+    });
   </script>
 </body>
 </html>

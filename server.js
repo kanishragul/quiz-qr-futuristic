@@ -25,14 +25,35 @@ fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
 const db = new sqlite3.Database(DB_PATH);
 
 // Middlewares
-app.use(helmet());
-app.use(express.json({limit:'2mb'}));
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:"],
+      },
+    },
+  })
+);
+app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors({ origin: true, credentials: true }));
 
 // Static
 app.use(express.static('public'));
+// ---- QR code endpoint ----
+app.get('/api/qr', async (req, res) => {
+  const joinUrl = `${req.protocol}://${req.get('host')}/participant.html`;
+  try {
+    const dataUrl = await QRCode.toDataURL(joinUrl, { margin: 2, scale: 8 });
+    res.json({ joinUrl, dataUrl });
+  } catch (e) {
+    res.status(500).json({ error: 'QR generation failed' });
+  }
+});
 
 // Helpers
 function signToken(user) {
@@ -342,12 +363,14 @@ app.get('/api/admin/export', adminRequired, (req, res) => {
     res.send(csv);
   });
 });
+// Serve static files and fallback
+app.use(express.static('public'));
 
-// Fallback to index
-app.get('*', (req,res)=>{
+app.get('*', (req, res) => {
   res.sendFile(path.resolve('public/index.html'));
 });
 
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

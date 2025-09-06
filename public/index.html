@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html>
 <head>
@@ -24,15 +23,11 @@
     </div>
     <footer>© Quiz Futuristic — Ready for classroom</footer>
   </div>
-  <script>
-    fetch('/api/qr').then(r=>r.json()).then(d=>{
-      const img = new Image();
-      img.src = d.dataUrl;
-      img.alt = 'Join QR';
-      img.style.maxWidth = '220px';
-      img.style.borderRadius = '16px';
-      document.getElementById('qr').appendChild(img);
-    });
-  </script>
+
+<!-- Load QRCode.js -->
+<script src="/js/qrcode.min.js"></script>
+<!-- Load your QR generation script -->
+<script src="/js/qr.js"></script>
+
 </body>
 </html>
