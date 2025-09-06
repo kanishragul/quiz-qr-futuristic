@@ -1,0 +1,44 @@
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Leaderboard</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>body{background:#020615;color:#e6eefc}</style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Final Leaderboard</h1>
+      <div id="info" class="small"></div>
+      <div id="board"></div>
+    </div>
+  </div>
+  <script>
+    async function loadBoard(){
+      const r = await fetch('/api/leaderboard');
+      const d = await r.json();
+      const info = document.getElementById('info');
+      const board = document.getElementById('board');
+      if (!d.published){
+        info.textContent = 'Leaderboard not published yet. Waiting for admin...';
+        board.innerHTML='';
+        setTimeout(loadBoard, 5000);
+        return;
+      }
+      info.textContent = '';
+      board.innerHTML = '<div class="grid" style="grid-template-columns:80px 2fr 1fr 1fr"><div><b>Rank</b></div><div><b>Name (Roll)</b></div><div><b>Score</b></div><div><b>Time (s)</b></div></div>';
+      d.leaderboard.forEach(item=>{
+        const row = document.createElement('div');
+        row.className='grid leader';
+        row.style.gridTemplateColumns='80px 2fr 1fr 1fr';
+        row.innerHTML = `<div>#${item.rank}</div><div>${item.name} (${item.roll})</div><div>${item.total_score}</div><div>${Math.round(item.total_time_ms/1000)}</div>`;
+        board.appendChild(row);
+      });
+    }
+    loadBoard();
+  </script>
+</body>
+</html>

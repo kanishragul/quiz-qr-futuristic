@@ -1,0 +1,38 @@
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Quiz Big Screen</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Scan to Join the Quiz</h1>
+      <p class="small">Use your phone to scan this QR and login/sign up.</p>
+      <div id="qr" class="qr" style="min-height:220px"></div>
+      <div class="grid" style="grid-template-columns: 1fr 1fr; margin-top:20px">
+        <div>
+          <a class="btn" href="leaderboard.html">Open Leaderboard Screen</a>
+        </div>
+        <div>
+          <a class="btn secondary" href="admin.html">Admin Panel</a>
+        </div>
+      </div>
+    </div>
+    <footer>© Quiz Futuristic — Ready for classroom</footer>
+  </div>
+  <script>
+    fetch('/api/qr').then(r=>r.json()).then(d=>{
+      const img = new Image();
+      img.src = d.dataUrl;
+      img.alt = 'Join QR';
+      img.style.maxWidth = '220px';
+      img.style.borderRadius = '16px';
+      document.getElementById('qr').appendChild(img);
+    });
+  </script>
+</body>
+</html>

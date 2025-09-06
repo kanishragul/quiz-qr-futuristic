@@ -1,0 +1,52 @@
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Login / Signup</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Welcome to the Quiz</h1>
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <div>
+          <h2>New here? Sign Up</h2>
+          <label>Name</label><input id="su_name">
+          <label>Roll Number</label><input id="su_roll">
+          <label>Email</label><input id="su_email" type="email">
+          <label>Password</label><input id="su_pass" type="password">
+          <button class="btn" onclick="signup()">Create Account</button>
+        </div>
+        <div>
+          <h2>Already have an account? Login</h2>
+          <label>Email</label><input id="li_email" type="email">
+          <label>Password</label><input id="li_pass" type="password">
+          <button class="btn" onclick="login()">Login</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    async function signup(){
+      const body = {
+        name: document.getElementById('su_name').value,
+        roll: document.getElementById('su_roll').value,
+        email: document.getElementById('su_email').value,
+        password: document.getElementById('su_pass').value
+      };
+      const r = await fetch('/api/auth/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      const d = await r.json();
+      if(d.ok){ location.href='dashboard.html'; } else alert(d.error||'Signup failed');
+    }
+    async function login(){
+      const body = { email: document.getElementById('li_email').value, password: document.getElementById('li_pass').value };
+      const r = await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      const d = await r.json();
+      if(d.ok){ location.href='dashboard.html'; } else alert(d.error||'Login failed');
+    }
+  </script>
+</body>
+</html>

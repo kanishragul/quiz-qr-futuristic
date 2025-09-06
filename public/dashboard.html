@@ -1,0 +1,120 @@
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Quiz Dashboard</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Quiz Sections</h1>
+      <p class="small">Complete all 5 tabs in any order. Each tab locks after submission.</p>
+      <div id="tabs" class="tabs"></div>
+      <div id="questions"></div>
+      <div id="actions"></div>
+      <div id="status" class="small"></div>
+    </div>
+  </div>
+  <script>
+    let currentTab = null;
+    let locked = {};
+
+    async function fetchStatus(){
+      const r = await fetch('/api/status');
+      const d = await r.json();
+      locked = d.locked || {};
+      renderTabs();
+    }
+
+    function renderTabs(){
+      const el = document.getElementById('tabs');
+      el.innerHTML='';
+      for(let i=1;i<=5;i++){
+        const b = document.createElement('button');
+        b.className = 'tab' + (locked[String(i)] ? ' completed' : '');
+        b.textContent = 'Tab ' + i + (locked[String(i)] ? ' ✔' : '');
+        b.onclick = ()=>loadTab(i);
+        el.appendChild(b);
+      }
+      document.getElementById('questions').innerHTML = '';
+      document.getElementById('actions').innerHTML = '';
+    }
+
+    async function loadTab(i){
+      if (locked[String(i)]) { alert('This tab is locked.'); return; }
+      currentTab = i;
+      const r = await fetch('/api/questions?tab='+i);
+      const d = await r.json();
+      if (d.error){ alert(d.error); return; }
+      const qWrap = document.getElementById('questions');
+      qWrap.innerHTML = '';
+      d.questions.forEach(q=>{
+        const div = document.createElement('div');
+        div.className = 'question';
+        const h = document.createElement('div');
+        h.innerHTML = '<b>Q'+q.id+'.</b> '+q.text;
+        div.appendChild(h);
+        // render inputs
+        if(q.type==='mcq_single'){
+          q.options.forEach(opt=>{
+            const id = 'q'+q.id+'_'+opt;
+            div.innerHTML += '<div><input type="radio" name="q'+q.id+'" value="'+opt+'"> '+opt+'</div>';
+          });
+        } else if(q.type==='mcq_multi'){
+          q.options.forEach(opt=>{
+            div.innerHTML += '<div><label><input type="checkbox" name="q'+q.id+'" value="'+opt+'"> '+opt+'</label></div>';
+          });
+        } else if(q.type==='true_false'){
+          div.innerHTML += '<div><label><input type="radio" name="q'+q.id+'" value="true"> True</label></div>';
+          div.innerHTML += '<div><label><input type="radio" name="q'+q.id+'" value="false"> False</label></div>';
+        } else if(q.type==='short_text'){
+          div.innerHTML += '<label>Your answer</label><input type="text" name="q'+q.id+'">';
+        }
+        qWrap.appendChild(div);
+      });
+      const actions = document.getElementById('actions');
+      actions.innerHTML = '<button class="btn" onclick="submitTab()">Submit Tab '+i+'</button>';
+    }
+
+    function collectAnswers(){
+      const answers = [];
+      document.querySelectorAll('#questions .question').forEach(qDiv=>{
+        const qid = Number(qDiv.querySelector('b').textContent.replace(/[^0-9]/g,''));
+        const inputs = qDiv.querySelectorAll('input');
+        let val = null;
+        const radios = Array.from(inputs).filter(i=>i.type==='radio');
+        const checks = Array.from(inputs).filter(i=>i.type==='checkbox');
+        const text = Array.from(inputs).find(i=>i.type==='text');
+        if (radios.length){
+          const one = radios.find(r=>r.checked);
+          val = one ? one.value : '';
+        } else if (checks.length){
+          val = checks.filter(c=>c.checked).map(c=>c.value);
+        } else if (text){
+          val = text.value;
+        }
+        answers.push({ questionId: qid, response: val });
+      });
+      return answers;
+    }
+
+    async function submitTab(){
+      if (currentTab==null) return;
+      const answers = collectAnswers();
+      const r = await fetch('/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab: currentTab, answers})});
+      const d = await r.json();
+      if (d.ok){
+        alert('Tab '+currentTab+' submitted. It is now locked.');
+        await fetchStatus();
+      } else {
+        alert(d.error||'Submit failed');
+      }
+    }
+
+    fetchStatus();
+  </script>
+</body>
+</html>

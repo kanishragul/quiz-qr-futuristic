@@ -1,0 +1,31 @@
+
+:root{
+  --bg:#0b0f1a;
+  --card:#11182a;
+  --accent:#7c5cff;
+  --accent2:#1ee9b6;
+  --text:#e6eefc;
+  --muted:#93a2c8;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:radial-gradient(1000px 600px at 50% -20%, #142042, var(--bg));color:var(--text);font-family:Inter,Segoe UI,Roboto,Helvetica,Arial,sans-serif;min-height:100%}
+a{color:var(--accent)}
+.container{max-width:1000px;margin:0 auto;padding:24px}
+.card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0));border:1px solid rgba(255,255,255,0.08);backdrop-filter:blur(6px);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.4);padding:24px}
+.btn{background:linear-gradient(90deg,var(--accent),#4e9eff);border:none;color:white;padding:12px 18px;border-radius:12px;font-weight:600;cursor:pointer;transition:transform .1s ease, box-shadow .2s ease;box-shadow:0 8px 20px rgba(124,92,255,.4)}
+.btn:hover{transform:translateY(-1px)}
+.btn.secondary{background:linear-gradient(90deg,var(--accent2),#4ef0ff);box-shadow:0 8px 20px rgba(30,233,182,.35)}
+.grid{display:grid;gap:16px}
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.tab{background:var(--card);padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.08);cursor:pointer}
+.tab.completed{outline:2px solid var(--accent2)}
+.question{padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.02);margin-bottom:10px}
+input,select{background:#0e1426;color:var(--text);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px;width:100%}
+label{display:block;margin:8px 0 6px;color:var(--muted)}
+h1,h2,h3{letter-spacing:.5px}
+.small{color:var(--muted);font-size:.9rem}
+.qr{display:flex;align-items:center;justify-content:center}
+.center{text-align:center}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#11213e;color:#b1c9ff;border:1px solid rgba(255,255,255,.1);font-size:.8rem}
+.leader{font-variant-numeric:tabular-nums}
+footer{opacity:.7;margin-top:30px;font-size:.85rem}
