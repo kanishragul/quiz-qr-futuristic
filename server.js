@@ -44,16 +44,18 @@ app.use(cors({ origin: true, credentials: true }));
 
 // Static
 app.use(express.static('public'));
-// ---- QR code endpoint ----
+// QR code endpoint
 app.get('/api/qr', async (req, res) => {
   const joinUrl = `${req.protocol}://${req.get('host')}/participant.html`;
   try {
     const dataUrl = await QRCode.toDataURL(joinUrl, { margin: 2, scale: 8 });
     res.json({ joinUrl, dataUrl });
   } catch (e) {
+    console.error("QR generation failed:", e); // 🔥 log error to console
     res.status(500).json({ error: 'QR generation failed' });
   }
 });
+
 
 // Helpers
 function signToken(user) {
@@ -87,9 +89,9 @@ function adminRequired(req, res, next) {
   }
 }
 
-// QR Join Link (for home page to embed as image)
+// QR Join Link (for student quiz page)
 app.get('/api/qr', async (req, res) => {
-  const joinUrl = `${req.protocol}://${req.get('host')}/login.html`;
+  const joinUrl = `${req.protocol}://${req.get('host')}/participant.html`; // ✅ points to quiz page
   try {
     const dataUrl = await QRCode.toDataURL(joinUrl, { margin: 2, scale: 8 });
     res.json({ joinUrl, dataUrl });
@@ -369,8 +371,7 @@ app.use(express.static('public'));
 app.get('*', (req, res) => {
   res.sendFile(path.resolve('public/index.html'));
 });
-
-// Start the server
+// Start server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`✅ Server running on http://localhost:${PORT}`);
 });
